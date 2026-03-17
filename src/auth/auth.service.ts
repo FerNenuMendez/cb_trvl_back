@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
+import { Role } from '../common/enums/roles.enum';
 
 @Injectable()
 export class AuthService {
@@ -51,8 +52,7 @@ export class AuthService {
         email: user.email,
         name: `${user.firstName} ${user.lastName}`,
         password: randomPassword,
-        // Usamos 'as any' para evitar el error de asignación del Role si es un Enum
-        role: 'travelexcel' as any,
+        role: Role.EXCEL,
       });
     }
 

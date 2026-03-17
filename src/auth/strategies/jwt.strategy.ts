@@ -11,7 +11,6 @@ import { Request } from 'express';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService) {
     super({
-      // ACÁ ESTÁ EL TRUCO: Extraemos el JWT de la cookie, no del Header
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
           return request?.cookies?.access_token;
