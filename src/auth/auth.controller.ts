@@ -1,9 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Res,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import type { Response } from 'express';
+import * as express from 'express';
 import { UsersService } from '../users/users.service';
+import { GoogleAuthGuard } from './guards/google-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -12,16 +21,34 @@ export class AuthController {
     private readonly usersService: UsersService,
   ) {}
 
+  @Get('google')
+  @UseGuards(GoogleAuthGuard)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async googleAuth(@Req() req: any) {
+    // El Guard redirige automáticamente a Google
+  }
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  async googleAuthRedirect(
+    @Req() req: any,
+    @Res({ passthrough: true }) res: express.Response,
+  ) {
+    return this.authService.googleLogin(req.user, res);
+  }
+
   @Post('login')
-  async login(@Body() body: any, @Res({ passthrough: true }) res: Response) {
+  async login(
+    @Body() body: any,
+    @Res({ passthrough: true }) res: express.Response,
+  ) {
     const authData = await this.authService.login(body.email, body.password);
 
-    // Seteamos la Cookie HTTP-only
     res.cookie('access_token', authData.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // true solo en producción (HTTPS)
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24, // 1 día
+      maxAge: 1000 * 60 * 60 * 24,
     });
 
     return {
@@ -31,7 +58,7 @@ export class AuthController {
   }
 
   @Post('logout')
-  logout(@Res({ passthrough: true }) res: Response) {
+  logout(@Res({ passthrough: true }) res: express.Response) {
     res.clearCookie('access_token');
     return { message: 'Sesión cerrada correctamente' };
   }

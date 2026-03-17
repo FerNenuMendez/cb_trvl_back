@@ -6,26 +6,28 @@ import { AuthController } from './auth.controller';
 import { UsersModule } from '../users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { GoogleStrategy } from './strategies/google.strategy'; // <--- 1. Importamos la nueva estrategia
 
 @Module({
   imports: [
     UsersModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    // Configuramos JWT de forma asíncrona para usar las variables del .env
+
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET')!,
         signOptions: {
-          // Aseguramos que expiresIn es un string válido
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN')! as any,
+          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') ||
+            '24h') as any,
         },
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, GoogleStrategy],
   controllers: [AuthController],
+  exports: [AuthService, JwtStrategy, GoogleStrategy, PassportModule],
 })
 export class AuthModule {}
