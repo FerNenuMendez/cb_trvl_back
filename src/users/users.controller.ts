@@ -4,18 +4,35 @@ import type { Request } from 'express';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from '../common/enums/roles.enum';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 
+@ApiTags('Usuarios')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
-  @UseGuards(JwtAuthGuard) // Protegemos esta ruta con el guard de JWT
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Obtener el perfil del usuario autenticado' })
+  @ApiResponse({ status: 200, description: 'Perfil obtenido correctamente.' })
+  @ApiResponse({ status: 401, description: 'No autorizado.' })
   @Get('me')
   getProfile(@Req() req: Request) {
-    // Si el Guard dejó pasar al usuario, la info está en req.user
     return {
       message: 'Token válido, bienvenido al perfil',
       user: req.user,
     };
   }
+
+  @ApiOperation({ summary: 'Panel de control para administradores' })
+  @ApiResponse({ status: 200, description: 'Acceso concedido.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Prohibido: No tienes permisos suficientes.',
+  })
   @Get('admin-dashboard')
   @Roles(Role.EXCEL)
   @UseGuards(JwtAuthGuard, RolesGuard)

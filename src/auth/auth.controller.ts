@@ -13,7 +13,9 @@ import { AuthService } from './auth.service';
 import * as express from 'express';
 import { UsersService } from '../users/users.service';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
+@ApiTags('Autenticación')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -21,13 +23,15 @@ export class AuthController {
     private readonly usersService: UsersService,
   ) {}
 
+  @ApiOperation({ summary: 'Redirigir a Google para autenticación' })
   @Get('google')
   @UseGuards(GoogleAuthGuard)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async googleAuth(@Req() req: any) {
+  async googleAuth(@Req() _req: any) {
     // El Guard redirige automáticamente a Google
   }
 
+  @ApiOperation({ summary: 'Callback de Google' })
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   async googleAuthRedirect(
@@ -37,6 +41,9 @@ export class AuthController {
     return this.authService.googleLogin(req.user, res);
   }
 
+  @ApiOperation({ summary: 'Login tradicional con email y contraseña' })
+  @ApiResponse({ status: 200, description: 'Login exitoso y cookie seteada.' })
+  @ApiResponse({ status: 401, description: 'Credenciales inválidas.' })
   @Post('login')
   async login(
     @Body() body: any,
@@ -57,12 +64,16 @@ export class AuthController {
     };
   }
 
+  @ApiOperation({ summary: 'Cerrar sesión' })
   @Post('logout')
   logout(@Res({ passthrough: true }) res: express.Response) {
     res.clearCookie('access_token');
     return { message: 'Sesión cerrada correctamente' };
   }
 
+  @ApiOperation({ summary: 'Registrar un nuevo usuario' })
+  @ApiResponse({ status: 201, description: 'Usuario registrado con éxito.' })
+  @ApiResponse({ status: 409, description: 'El email ya está en uso.' })
   @Post('register')
   async register(@Body() body: any) {
     return this.usersService.create(body);
