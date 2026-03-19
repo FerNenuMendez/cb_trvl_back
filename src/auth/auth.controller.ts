@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Controller,
@@ -14,6 +13,8 @@ import * as express from 'express';
 import { UsersService } from '../users/users.service';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
 
 @ApiTags('Autenticación')
 @Controller('auth')
@@ -46,10 +47,13 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Credenciales inválidas.' })
   @Post('login')
   async login(
-    @Body() body: any,
+    @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: express.Response,
   ) {
-    const authData = await this.authService.login(body.email, body.password);
+    const authData = await this.authService.login(
+      loginDto.email,
+      loginDto.password,
+    );
 
     res.cookie('access_token', authData.access_token, {
       httpOnly: true,
@@ -75,7 +79,7 @@ export class AuthController {
   @ApiResponse({ status: 201, description: 'Usuario registrado con éxito.' })
   @ApiResponse({ status: 409, description: 'El email ya está en uso.' })
   @Post('register')
-  async register(@Body() body: any) {
-    return this.usersService.create(body);
+  async register(@Body() registerDto: RegisterDto) {
+    return this.usersService.create(registerDto);
   }
 }
