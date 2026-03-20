@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   Injectable,
   UnauthorizedException,
@@ -11,19 +8,27 @@ import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { Response } from 'express';
 import { Role } from '../common/enums/roles.enum';
+import { ConfigService } from '@nestjs/config';
 
+interface GoogleUser {
+  email: string;
+  firstName: string;
+  lastName: string;
+  picture?: string;
+}
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
   ) {}
 
   async login(email: string, pass: string) {
     const user = await this.usersService.findByEmail(email);
 
     if (user && user.password && (await bcrypt.compare(pass, user.password))) {
-      const payload = { sub: user._id, email: user.email, role: user.role };
+      const payload = { sub: user.id, email: user.email, role: user.role };
       return {
         access_token: this.jwtService.sign(payload),
         user: {
@@ -34,10 +39,10 @@ export class AuthService {
       };
     }
 
-    throw new UnauthorizedException('Credenciales incorrectas, Nenu');
+    throw new UnauthorizedException('Credenciales incorrectas');
   }
 
-  async googleLogin(user: any, res: Response) {
+  async googleLogin(user: GoogleUser, res: Response) {
     if (!user) {
       throw new BadRequestException('No se recibió el usuario de Google');
     }
@@ -58,16 +63,19 @@ export class AuthService {
 
     // 3. Generamos nuestro JWT
     const payload = {
-      sub: userInDb._id,
+      sub: userInDb.id,
       email: userInDb.email,
       role: userInDb.role,
     };
     const accessToken = this.jwtService.sign(payload);
 
-    // 4. Seteamos la cookie (Ahora res.cookie no dará error)
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+
+    // 4. Seteamos la cookie
     res.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
       sameSite: 'strict',
       maxAge: 1000 * 60 * 60 * 24, // 1 día
     });
@@ -75,7 +83,7 @@ export class AuthService {
     return {
       message: 'Login con Google exitoso',
       user: {
-        _id: userInDb._id,
+        _id: userInDb.id,
         email: userInDb.email,
         name: userInDb.name,
         role: userInDb.role,

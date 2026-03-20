@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Controller,
@@ -15,6 +16,7 @@ import { GoogleAuthGuard } from './guards/google-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Autenticación')
 @Controller('auth')
@@ -22,6 +24,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
+    private readonly configService: ConfigService,
   ) {}
 
   @ApiOperation({ summary: 'Redirigir a Google para autenticación' })
@@ -55,9 +58,12 @@ export class AuthController {
       loginDto.password,
     );
 
+    const isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+
     res.cookie('access_token', authData.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: isProduction,
       sameSite: 'strict',
       maxAge: 1000 * 60 * 60 * 24,
     });

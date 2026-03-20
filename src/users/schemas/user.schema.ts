@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Role } from '../../common/enums/roles.enum';
@@ -5,8 +7,18 @@ import { Role } from '../../common/enums/roles.enum';
 @Schema({
   collection: 'cb_trv_users',
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+    transform: (doc, ret: any) => {
+      delete ret._id;
+      delete ret.__v;
+      return ret;
+    },
+  },
 })
 export class User extends Document {
+  id: string;
+
   @Prop({ unique: true, required: true })
   email: string;
 
