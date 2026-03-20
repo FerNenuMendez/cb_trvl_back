@@ -3,6 +3,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Role } from '../../common/enums/roles.enum';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Schema({
   collection: 'cb_trv_users',
@@ -17,8 +18,16 @@ import { Role } from '../../common/enums/roles.enum';
   },
 })
 export class User extends Document {
+  @ApiProperty({
+    example: '65f1...abc',
+    description: 'ID único del usuario (UUID/ObjectId)',
+  })
   id: string;
 
+  @ApiProperty({
+    example: 'fer@test.com',
+    description: 'El correo del usuario',
+  })
   @Prop({ unique: true, required: true })
   email: string;
 
@@ -28,6 +37,11 @@ export class User extends Document {
   @Prop()
   googleId?: string; // Para guardar el ID que nos mande Google
 
+  @ApiProperty({
+    enum: Role,
+    example: Role.TRAVELER,
+    description: 'Nivel de acceso del usuario',
+  })
   @Prop({
     type: String,
     enum: [Role.TRAVELER, Role.PRO, Role.PLUS, Role.EXCEL],
@@ -35,9 +49,15 @@ export class User extends Document {
   })
   role: Role;
 
+  @ApiProperty({ example: 'Fernando Mendez', description: 'Nombre completo' })
   @Prop()
   name: string;
 
+  @ApiProperty({
+    example: 'https://avatar.com/u/123',
+    description: 'URL de la imagen de perfil',
+    required: false,
+  })
   @Prop()
   avatar?: string;
 }

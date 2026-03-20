@@ -28,6 +28,14 @@ export class AuthController {
   ) {}
 
   @ApiOperation({ summary: 'Redirigir a Google para autenticación' })
+  @ApiResponse({
+    status: 302,
+    description: 'Redirige a Google para autenticación.',
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'No autorizado (si el Guard falla antes de redirigir).',
+  })
   @Get('google')
   @UseGuards(GoogleAuthGuard)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,6 +44,14 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Callback de Google' })
+  @ApiResponse({
+    status: 200,
+    description: 'Login exitoso y cookie establecida.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'No se recibió el usuario desde Google.',
+  })
   @Get('google/callback')
   @UseGuards(GoogleAuthGuard)
   async googleAuthRedirect(
@@ -46,7 +62,14 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Login tradicional con email y contraseña' })
-  @ApiResponse({ status: 200, description: 'Login exitoso y cookie seteada.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Login exitoso y cookie establecida.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos de entrada inválidos (ValidationPipe).',
+  })
   @ApiResponse({ status: 401, description: 'Credenciales inválidas.' })
   @Post('login')
   async login(
@@ -75,6 +98,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Cerrar sesión' })
+  @ApiResponse({ status: 201, description: 'Cookie eliminada correctamente.' })
   @Post('logout')
   logout(@Res({ passthrough: true }) res: express.Response) {
     res.clearCookie('access_token');
@@ -83,6 +107,10 @@ export class AuthController {
 
   @ApiOperation({ summary: 'Registrar un nuevo usuario' })
   @ApiResponse({ status: 201, description: 'Usuario registrado con éxito.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Error de validación en los datos enviados.',
+  })
   @ApiResponse({ status: 409, description: 'El email ya está en uso.' })
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {

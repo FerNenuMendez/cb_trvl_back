@@ -11,8 +11,8 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 
-@ApiTags('Usuarios')
 @ApiBearerAuth()
+@ApiTags('Usuarios')
 @Controller('users')
 export class UsersController {
   @UseGuards(JwtAuthGuard)
@@ -29,6 +29,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Panel de control para administradores' })
   @ApiResponse({ status: 200, description: 'Acceso concedido.' })
+  @ApiResponse({ status: 401, description: 'No autorizado (Token inválido).' })
   @ApiResponse({
     status: 403,
     description: 'Prohibido: No tienes permisos suficientes.',

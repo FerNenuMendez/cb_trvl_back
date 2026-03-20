@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import {
   IsEmail,
   IsNotEmpty,
@@ -28,12 +27,20 @@ export class RegisterDto {
   @IsNotEmpty()
   password: string;
 
-  @ApiProperty({ example: 'Fernando Mendez' })
+  @ApiProperty({
+    example: 'Fernando Mendez',
+    description: 'Nombre completo',
+  })
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @ApiProperty({ enum: Role, default: Role.TRAVELER, required: false })
+  @ApiProperty({
+    enum: Role,
+    default: Role.TRAVELER,
+    required: false,
+    description: 'Nivel de acceso del usuario',
+  })
   @IsEnum(Role)
   @IsOptional()
   role?: Role;
