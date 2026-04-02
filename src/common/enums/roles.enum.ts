@@ -1,6 +1,6 @@
 export enum Role {
-  TRAVELER = 'traveler',
-  PRO = 'travelerpro',
-  PLUS = 'travelerplus',
-  EXCEL = 'travelexcel',
+  USER = 'user',
+  ADMIN = 'admin',
+  USERPLUS = 'userplus',
+  USEREXCEL = 'userexcel',
 }

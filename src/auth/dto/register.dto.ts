@@ -37,7 +37,7 @@ export class RegisterDto {
 
   @ApiProperty({
     enum: Role,
-    default: Role.TRAVELER,
+    default: Role.USER,
     required: false,
     description: 'Nivel de acceso del usuario',
   })

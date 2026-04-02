@@ -35,7 +35,7 @@ export class UsersController {
     description: 'Prohibido: No tienes permisos suficientes.',
   })
   @Get('admin-dashboard')
-  @Roles(Role.EXCEL)
+  @Roles(Role.USER)
   @UseGuards(JwtAuthGuard, RolesGuard)
   getAdminData() {
     return { message: 'Bienvenido al panel de control, jefe' };

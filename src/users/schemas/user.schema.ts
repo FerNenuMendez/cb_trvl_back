@@ -39,13 +39,13 @@ export class User extends Document {
 
   @ApiProperty({
     enum: Role,
-    example: Role.TRAVELER,
+    example: Role.USER,
     description: 'Nivel de acceso del usuario',
   })
   @Prop({
     type: String,
-    enum: [Role.TRAVELER, Role.PRO, Role.PLUS, Role.EXCEL],
-    default: Role.TRAVELER,
+    enum: [Role.USER, Role.ADMIN, Role.USERPLUS, Role.USEREXCEL],
+    default: Role.USER,
   })
   role: Role;
 

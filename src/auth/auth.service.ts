@@ -57,7 +57,7 @@ export class AuthService {
         email: user.email,
         name: `${user.firstName} ${user.lastName}`,
         password: randomPassword,
-        role: Role.EXCEL,
+        role: Role.USER,
       });
     }
 
