@@ -75,10 +75,15 @@ npm run test
 Método,Ruta,Descripción
 
 POST,/auth/register,Crea un nuevo usuario y envía un mail de verificación con token único.
+
 GET,/auth/verify/:token,Valida el token del email y activa la cuenta del usuario (isVerified: true).
+
 POST,/auth/login,"Valida credenciales, comprueba estado de verificación y retorna cookie JWT."
+
 GET,/auth/google,Redirige al flujo de autenticación de Google.
+
 GET,/auth/google/callback,"Callback de Google, registra o loguea al usuario y retorna cookie JWT."
+
 POST,/auth/logout,Limpia la cookie del token de acceso cerrando la sesión.
 
 ### 👨‍💻 Autor
