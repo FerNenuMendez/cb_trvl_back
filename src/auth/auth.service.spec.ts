@@ -53,7 +53,7 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    it('debería retornar un access_token si las credenciales son válidas', async () => {
+    it('debería retornar un access_token si las credenciales son válidas y el mail está verificado', async () => {
       // Arrange (Preparar)
       const plainPassword = 'password123';
       const hashedPassword = await bcrypt.hash(plainPassword, 10);
@@ -62,7 +62,8 @@ describe('AuthService', () => {
         email: 'fer@test.com',
         password: hashedPassword,
         name: 'Fer',
-        role: Role.TRAVELER,
+        role: Role.USER,
+        isVerified: true, // El usuario validó su correo
       };
 
       mockUsersService.findByEmail.mockResolvedValue(mockUser);
@@ -76,11 +77,32 @@ describe('AuthService', () => {
       expect(mockJwtService.sign).toHaveBeenCalled();
     });
 
+    it('debería lanzar UnauthorizedException si el correo NO está verificado', async () => {
+      // Arrange
+      const plainPassword = 'password123';
+      const hashedPassword = await bcrypt.hash(plainPassword, 10);
+
+      mockUsersService.findByEmail.mockResolvedValue({
+        id: 'user-id',
+        email: 'fer@test.com',
+        password: hashedPassword,
+        name: 'Fer',
+        role: Role.USER,
+        isVerified: false, // El usuario NO validó su correo
+      });
+
+      // Act & Assert
+      await expect(
+        authService.login('fer@test.com', plainPassword),
+      ).rejects.toThrow(UnauthorizedException);
+    });
+
     it('debería lanzar UnauthorizedException si la contraseña es incorrecta', async () => {
       // Arrange
       mockUsersService.findByEmail.mockResolvedValue({
         email: 'fer@test.com',
         password: 'password-en-db',
+        isVerified: true,
       });
 
       // Act & Assert

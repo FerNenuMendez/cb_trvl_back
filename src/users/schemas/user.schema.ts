@@ -60,6 +60,13 @@ export class User extends Document {
   })
   @Prop()
   avatar?: string;
+
+  @ApiProperty({ description: 'Indica si el usuario validó su email' })
+  @Prop({ default: false })
+  isVerified: boolean;
+
+  @Prop()
+  verificationToken?: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

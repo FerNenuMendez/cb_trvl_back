@@ -28,6 +28,12 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
 
     if (user && user.password && (await bcrypt.compare(pass, user.password))) {
+      // ---> NUEVA VALIDACIÓN: Revisar si está verificado <---
+      if (!user.isVerified) {
+        throw new UnauthorizedException(
+          'Por favor, verificá tu correo antes de iniciar sesión.',
+        );
+      }
       const payload = { sub: user.id, email: user.email, role: user.role };
       return {
         access_token: this.jwtService.sign(payload),

@@ -8,6 +8,8 @@ import {
   Res,
   Req,
   UseGuards,
+  Param,
+  BadRequestException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import * as express from 'express';
@@ -106,7 +108,10 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Registrar un nuevo usuario' })
-  @ApiResponse({ status: 201, description: 'Usuario registrado con éxito.' })
+  @ApiResponse({
+    status: 201,
+    description: 'Usuario registrado con éxito. Revisar correo.',
+  })
   @ApiResponse({
     status: 400,
     description: 'Error de validación en los datos enviados.',
@@ -114,6 +119,24 @@ export class AuthController {
   @ApiResponse({ status: 409, description: 'El email ya está en uso.' })
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
-    return this.usersService.create(registerDto);
+    await this.usersService.create(registerDto);
+    return {
+      message:
+        'Registro exitoso. Por favor, revisá tu correo para activar la cuenta.',
+    };
+  }
+  // ---> ENDPOINT DE VERIFICACIÓN
+  @ApiOperation({
+    summary: 'Verificar cuenta mediante token enviado por email',
+  })
+  @Get('verify/:token')
+  async verifyEmail(@Param('token') token: string) {
+    if (!token) {
+      throw new BadRequestException('Falta el token de verificación');
+    }
+    await this.usersService.verifyUserEmail(token);
+    return {
+      message: 'Cuenta activada correctamente. Ya podés iniciar sesión.',
+    };
   }
 }
