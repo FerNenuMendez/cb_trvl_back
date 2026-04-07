@@ -73,6 +73,7 @@ npm run test
 
 ### 📍 Endpoints Principales (Auth)
 Método,Ruta,Descripción
+
 POST,/auth/register,Crea un nuevo usuario y envía un mail de verificación con token único.
 GET,/auth/verify/:token,Valida el token del email y activa la cuenta del usuario (isVerified: true).
 POST,/auth/login,"Valida credenciales, comprueba estado de verificación y retorna cookie JWT."
