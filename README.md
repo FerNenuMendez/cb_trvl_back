@@ -54,7 +54,7 @@ EMAIL_PORT=465
 EMAIL_USER=tu_email@gmail.com
 EMAIL_PASS=tu_contraseña_de_aplicacion_de_16_letras
 
-### 4.Levantar el Servidor
+### 4. Levantar el Servidor
 # Desarrollo
 ```Bash
 npm run start:dev
