@@ -5,7 +5,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
-
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,7 +21,8 @@ import { MailerModule } from '@nestjs-modules/mailer';
         uri: configService.get<string>('MONGODB_URI'),
       }),
     }),
-
+    AppController,
+    AppService,
     AuthModule,
     UsersModule,
     MailerModule.forRootAsync({

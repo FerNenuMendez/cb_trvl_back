@@ -6,6 +6,23 @@
       "use": "@vercel/node"
     }
   ],
+  "redirects": [
+    {
+      "source": "/api/swagger-ui-bundle.js",
+      "destination": "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-bundle.min.js",
+      "permanent": true
+    },
+    {
+      "source": "/api/swagger-ui-standalone-preset.js",
+      "destination": "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-standalone-preset.min.js",
+      "permanent": true
+    },
+    {
+      "source": "/api/swagger-ui.css",
+      "destination": "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui.min.css",
+      "permanent": true
+    }
+  ],
   "routes": [
     {
       "src": "/(.*)",
