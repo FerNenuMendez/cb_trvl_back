@@ -67,6 +67,13 @@ export class User extends Document {
 
   @Prop()
   verificationToken?: string;
+
+  // CAMPOS PARA RECUPERAR CONTRASEÑA
+  @Prop()
+  resetPasswordToken?: string;
+
+  @Prop()
+  resetPasswordExpires?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

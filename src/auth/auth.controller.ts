@@ -19,6 +19,8 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { ConfigService } from '@nestjs/config';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @ApiTags('Autenticación')
 @Controller('auth')
@@ -137,6 +139,46 @@ export class AuthController {
     await this.usersService.verifyUserEmail(token);
     return {
       message: 'Cuenta activada correctamente. Ya podés iniciar sesión.',
+    };
+  }
+
+  // ---> ENDPOINTS DE RECUPERACIÓN DE CONTRASEÑA
+  @ApiOperation({
+    summary: 'Solicitar recuperación de contraseña (envía email)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Instrucciones enviadas (mensaje genérico por seguridad).',
+  })
+  @Post('forgot-password')
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    await this.usersService.generatePasswordResetToken(forgotPasswordDto.email);
+
+    return {
+      message:
+        'Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.',
+    };
+  }
+
+  @ApiOperation({ summary: 'Cambiar la contraseña usando el token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Contraseña actualizada correctamente.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'El token de recuperación es inválido o ha expirado.',
+  })
+  @Post('reset-password')
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    await this.usersService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto.newPassword,
+    );
+
+    return {
+      message:
+        'Tu contraseña ha sido actualizada con éxito. Ya podés iniciar sesión.',
     };
   }
 }
