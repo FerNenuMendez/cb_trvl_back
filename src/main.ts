@@ -9,6 +9,7 @@ import helmet from 'helmet';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+
   app.use(helmet());
 
   app.useGlobalPipes(
@@ -18,25 +19,48 @@ async function bootstrap() {
       transform: true, // Convierte tipos automáticamente
     }),
   );
+
   app.use(cookieParser());
+
+  // =========================================================
+  // ---> CONFIGURACIÓN DE CORS MEJORADA <---
+  // =========================================================
+  // Traemos la URL del frontend de las variables de entorno, o usamos un fallback
+  const frontendUrl =
+    configService.get<string>('FRONTEND_URL') || 'http://localhost:5173'; // Asumo puerto 5173 (Vite/React), cambialo si usás otro
+
   app.enableCors({
-    origin: 'http://localhost:3000',
-    credentials: true,
+    // Permitimos múltiples orígenes: tu frontend local, tu frontend en prod, y el mismo localhost de Nest
+    origin: ['http://localhost:3000', 'http://localhost:5173', frontendUrl],
+    credentials: true, // Fundamental para que pasen las cookies del JWT
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   });
 
+  // =========================================================
+  // ---> CONFIGURACIÓN DE SWAGGER PARA VERCEL <---
+  // =========================================================
   const config = new DocumentBuilder()
-    .setTitle('CB Travel API')
-    .setDescription('Documentación de la API de gestión de viajes')
+    .setTitle('Login Gen API')
+    .setDescription('Documentación de la API de Login Gen')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
 
-  const port = configService.get<number>('PORT');
+  // El truco mágico: cargar estáticos de Swagger desde un CDN
+  SwaggerModule.setup('api', app, document, {
+    customCssUrl:
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui.min.css',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-bundle.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-standalone-preset.js',
+    ],
+  });
 
-  await app.listen(port ?? 3000);
-  console.log(`API running on: http://localhost:${port}/api`);
+  const port = configService.get<number>('PORT') || 3000;
+
+  await app.listen(port);
+  console.log(`API running on port: ${port}`);
 }
 void bootstrap();
