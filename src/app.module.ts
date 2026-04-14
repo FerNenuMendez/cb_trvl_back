@@ -7,13 +7,13 @@ import { UsersModule } from './users/users.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: envValidationSchema,
     }),
-
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -21,8 +21,6 @@ import { AppService } from './app.service';
         uri: configService.get<string>('MONGODB_URI'),
       }),
     }),
-    AppController,
-    AppService,
     AuthModule,
     UsersModule,
     MailerModule.forRootAsync({
@@ -32,12 +30,11 @@ import { AppService } from './app.service';
         transport: {
           host: config.get<string>('EMAIL_HOST'),
           port: config.get<number>('EMAIL_PORT') || 465,
-          secure: true, // true para puerto 465, false para otros
+          secure: true,
           auth: {
             user: config.get<string>('EMAIL_USER'),
             pass: config.get<string>('EMAIL_PASS'),
           },
-          // ---> MODO DE PRUEBA <---
           tls: {
             rejectUnauthorized: false,
           },
@@ -48,5 +45,7 @@ import { AppService } from './app.service';
       }),
     }),
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
