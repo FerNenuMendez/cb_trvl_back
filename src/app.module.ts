@@ -36,7 +36,7 @@ import { AppService } from './app.service';
             pass: config.get<string>('EMAIL_PASS'),
           },
           tls: {
-            rejectUnauthorized: false,
+            rejectUnauthorized: false, // Ideal para testear
           },
         },
         defaults: {
