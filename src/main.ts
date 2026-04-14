@@ -22,12 +22,8 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  // =========================================================
-  // ---> CONFIGURACIÓN DE CORS MEJORADA <---
-  // =========================================================
-  // Traemos la URL del frontend de las variables de entorno, o usamos un fallback
   const frontendUrl =
-    configService.get<string>('FRONTEND_URL') || 'http://localhost:5173'; // Asumo puerto 5173 (Vite/React), cambialo si usás otro
+    configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
 
   app.enableCors({
     // Permitimos múltiples orígenes: tu frontend local, tu frontend en prod, y el mismo localhost de Nest
@@ -50,11 +46,16 @@ async function bootstrap() {
 
   // El truco mágico: cargar estáticos de Swagger desde un CDN
   SwaggerModule.setup('api', app, document, {
-    customCssUrl:
-      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui.min.css',
+    customSiteTitle: 'Login Gen API Docs',
+    customfavIcon: 'https://swagger.io/_nuxt/icon.png',
     customJs: [
-      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-bundle.js',
-      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-standalone-preset.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-bundle.min.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-standalone-preset.min.js',
+    ],
+    customCssUrl: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui.min.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-standalone-preset.min.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui.css',
     ],
   });
 
